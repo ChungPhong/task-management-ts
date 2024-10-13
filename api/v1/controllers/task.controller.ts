@@ -64,3 +64,67 @@ export const detail = async (req: Request, res: Response) => {
   });
   res.json(task);
 };
+
+// [PATCH] /api/v1/tasks/change-status/:id
+export const changeStatus = async (req: Request, res: Response) => {
+  try {
+    const id: string = req.params.id;
+    const status: string = req.body.status;
+
+    await Task.updateOne(
+      {
+        _id: id,
+      },
+      {
+        status: status,
+      }
+    );
+    res.json({
+      code: 200,
+      message: "Cập nhật trạng thái thành công",
+    });
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Không tồn tại",
+    });
+  }
+};
+
+// [PATCH] /api/v1/tasks/change-multi/
+export const changeMulti = async (req, res) => {
+  try {
+    const ids: string[] = req.body.ids;
+    const key: string = req.body.key; // any
+    const value: string = req.body.value;
+
+    switch (key) {
+      case "status":
+        await Task.updateMany(
+          {
+            _id: { $in: ids },
+          },
+          {
+            status: value,
+          }
+        );
+        res.json({
+          code: 200,
+          message: "Cập nhật trạng thái thành công",
+        });
+        break;
+
+      default:
+        res.json({
+          code: 400,
+          message: "Không tồn tại",
+        });
+        break;
+    }
+  } catch (error) {
+    res.json({
+      code: 400,
+      message: "Không tồn tại",
+    });
+  }
+};
